@@ -1,6 +1,10 @@
 const csv = require('csv-parser');
 const fs = require('fs');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+var express = require('express');
+var app = express();
+
+
 
 const util = require('util');
 util.inspect.defaultOptions.maxArrayLength = null; 
@@ -46,42 +50,26 @@ fs.createReadStream('data.csv')
         console.log('CSV file successfully processed');
         // gravar o csv recebendo valores do data
         // console.log(results);
-        
+
+        var header = Object.getOwnPropertyNames(results[0]);
+        header = header.map((val) => new Object({id: val, title: val}));
+
         const csvWriter = createCsvWriter({
             path: 'out.csv',
-            header: [
-              {id: 'name', title: 'Name'},
-              {id: 'surname', title: 'Surname'},
-              {id: 'age', title: 'Age'},
-              {id: 'gender', title: 'Gender'},
-            ]
+            header: header
           });
           
-          const data = [
-            {
-              name: 'John',
-              surname: 'Snow',
-              age: 26,
-              gender: 'M'
-            }, {
-              name: 'Clair',
-              surname: 'White',
-              age: 33,
-              gender: 'F',
-            }, {
-              name: 'Fancy',
-              surname: 'Brown',
-              age: 78,
-              gender: 'F'
-            }
-          ];
-          
           csvWriter
-            .writeRecords(data)
+            .writeRecords(results)
             .then(()=> console.log('The CSV file was written successfully'));
-
-
     });
 
+    app.get('/', function (req, res) {
+      res.send(results);
+    });
+    
+    app.listen(3000, function () {
+      console.log('Example app listening on port 3000!');
+    });
 
     
